@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ใส่ข้อมูลตัวอย่าง · LeaveEasy</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/data.js"></script>
+  <script type="module" src="js/seed.js"></script>
+</head>
+<body>
+  <div class="navbar"><span class="brand">🔧 LeaveEasy</span><a href="index.html">หน้าแรก</a></div>
+
+  <div class="container">
+    <h1>ใส่ข้อมูลตัวอย่าง (seed)</h1>
+    <p class="subtitle">เขียนข้อมูลสมมติตามสเปกหัวข้อ 7 ลง Firestore ด้วยรหัสไฟล์คงที่ · กดซ้ำได้ ข้อมูลจะถูกเขียนทับด้วยค่าเดิม ไม่ซ้ำซ้อน</p>
+
+    <div class="card">
+      <div class="alert alert-warn">
+        ต้องรันหน้านี้ก่อน publish กฎรายห้อง (หรือตอนที่กฎอนุญาตให้เขียน) · ผู้ใช้ 3 คนที่ใส่ให้เป็นข้อมูลตัวอย่างในโฟลเดอร์ <code>users</code> ไม่ใช่บัญชีล็อกอินจริง
+      </div>
+      <div class="btn-row">
+        <button type="button" id="ปุ่มSeed">ใส่ข้อมูลตัวอย่างลง Firestore</button>
+      </div>
+      <pre id="บันทึก" style="white-space:pre-wrap;margin-top:14px"></pre>
+    </div>
+  </div>
+</body>
+</html>

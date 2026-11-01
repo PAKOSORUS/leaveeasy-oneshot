@@ -6,9 +6,8 @@
   <title>ยื่นใบลาใหม่ · LeaveEasy</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/util.js" defer></script>
-  <script src="js/nav.js" defer></script>
-  <script src="js/data.js" defer></script>
-  <script src="js/new-leave-request.js" defer></script>
+  <script type="module" src="js/nav.js"></script>
+  <script type="module" src="js/new-leave-request.js"></script>
 </head>
 <body>
   <div id="nav"></div>
@@ -31,6 +30,13 @@
         <select id="leaveTypeId">
           <option value="">— เลือกประเภทการลา —</option>
         </select>
+
+        <!-- ปุ่มผู้ช่วย AI (ตำแหน่งว่างสำหรับ ai-feature) — ผู้ใช้แก้ประเภทที่ AI เลือกได้เสมอ -->
+        <div id="กล่องจัดประเภทAI" class="btn-row">
+          <button type="button" class="btn-ghost" id="ปุ่มจัดประเภทAI">ให้ AI ช่วยจัดประเภทการลา</button>
+        </div>
+        <div id="ป้ายAI" class="alert alert-ai hidden">ข้อเสนอจาก AI — โปรดตรวจสอบก่อนยืนยัน</div>
+        <div id="เตือนAI" class="alert alert-error hidden"></div>
 
         <label for="startDate">วันที่เริ่มลา</label>
         <input type="date" id="startDate">

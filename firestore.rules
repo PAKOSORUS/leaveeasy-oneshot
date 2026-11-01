@@ -1,0 +1,86 @@
+rules_version = '2';
+
+// กฎเฝ้าข้อมูลรายห้องของ LeaveEasy (สัปดาห์ที่ 8)
+// บทบาทอ่านจากช่อง role ในไฟล์ users/<uid> : employee | manager | hr
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function roleOf() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // ผู้อนุมัติ (manager) และฝ่ายบุคคล (hr)
+    function isReviewer() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && (roleOf() == 'manager' || roleOf() == 'hr');
+    }
+
+    function isHr() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && roleOf() == 'hr';
+    }
+
+    // 📁 users — อ่านได้เฉพาะไฟล์ตัวเอง (ผู้พิจารณาอ่านได้ทุกไฟล์)
+    //    สมัครใหม่สร้างได้เฉพาะไฟล์ของตัวเองและต้องเป็น employee · แก้/ลบไม่ได้
+    match /users/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isReviewer());
+      allow create: if isSignedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == 'employee'
+        && request.resource.data.keys().hasOnly(['name', 'email', 'role']);
+      allow update, delete: if false;
+    }
+
+    // 📁 leaveTypes — คนที่ล็อกอินแล้วอ่านได้ · เพิ่ม/แก้/ลบ เฉพาะฝ่ายบุคคล
+    match /leaveTypes/{typeId} {
+      allow read: if isSignedIn();
+      allow write: if isHr();
+    }
+
+    // 📁 leaveRequests
+    match /leaveRequests/{requestId} {
+      // ผู้ขอลาอ่านได้เฉพาะใบของตัวเอง · ผู้อนุมัติและฝ่ายบุคคลอ่านได้ทุกใบ
+      allow read: if isSignedIn()
+        && (resource.data.requesterId == request.auth.uid || isReviewer());
+
+      // สร้างได้เฉพาะใบของตัวเอง และสถานะเริ่มต้นต้องเป็น รอพิจารณา
+      allow create: if isSignedIn()
+        && request.resource.data.requesterId == request.auth.uid
+        && request.resource.data.status == 'รอพิจารณา';
+
+      // เปลี่ยนสถานะ: เฉพาะผู้พิจารณา จาก รอพิจารณา → อนุมัติ/ไม่อนุมัติ และแก้เฉพาะช่อง status
+      allow update: if isReviewer()
+        && resource.data.status == 'รอพิจารณา'
+        && request.resource.data.status in ['อนุมัติ', 'ไม่อนุมัติ']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+
+      // ลบได้เฉพาะเจ้าของใบ และเฉพาะใบที่ยังรอพิจารณา
+      allow delete: if isSignedIn()
+        && resource.data.requesterId == request.auth.uid
+        && resource.data.status == 'รอพิจารณา';
+
+      // 📁 approvals — โฟลเดอร์ย่อยของใบลา
+      match /approvals/{approvalId} {
+        // อ่านได้เมื่อมีสิทธิ์เห็นใบลาแม่ (เจ้าของใบ หรือผู้พิจารณา)
+        allow read: if isSignedIn()
+          && (get(/databases/$(database)/documents/leaveRequests/$(requestId)).data.requesterId == request.auth.uid
+              || isReviewer());
+
+        // เขียนความเห็นได้เฉพาะในใบของตัวเอง หรือผู้พิจารณาเขียนได้ทุกใบ · ต้องลงชื่อผู้เขียนเป็นตัวเอง
+        allow create: if isSignedIn()
+          && request.resource.data.authorId == request.auth.uid
+          && (get(/databases/$(database)/documents/leaveRequests/$(requestId)).data.requesterId == request.auth.uid
+              || isReviewer());
+
+        // ความเห็นที่ส่งแล้ว แก้/ลบไม่ได้
+        allow update, delete: if false;
+      }
+    }
+  }
+}

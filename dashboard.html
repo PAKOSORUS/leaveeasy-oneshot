@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แดชบอร์ดสรุป · LeaveEasy</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="nav"></div>
+
+  <div class="container">
+    <h1>แดชบอร์ดสรุป</h1>
+    <p class="subtitle">ภาพรวมใบขอลาในระบบ · หน้าโครงจาก prototype (ต่อข้อมูลจริงใน Module 3)</p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <div>รอพิจารณา</div>
+        <div class="number" id="จำนวนรอพิจารณา">–</div>
+      </div>
+      <div class="stat">
+        <div>อนุมัติ</div>
+        <div class="number" id="จำนวนอนุมัติ">–</div>
+      </div>
+      <div class="stat">
+        <div>ไม่อนุมัติ</div>
+        <div class="number" id="จำนวนไม่อนุมัติ">–</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px">
+      <h2>ใบลา 5 รายการล่าสุด</h2>
+      <div id="รายการล่าสุด">
+        <p>ยังไม่มีข้อมูล — หน้านี้เป็นหน้าโครง</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-ghost" href="leave-requests.html">ดูใบลาทั้งหมด</a>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-ghost" href="index.html">← กลับหน้าแรก</a>
+    </div>
+  </div>
+
+  <script src="js/util.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>

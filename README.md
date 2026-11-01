@@ -1,3 +1,6 @@
+> 🌐 **เว็บออนไลน์:** https://leaveeasy-phakhin-nantakarn.web.app
+> 🧪 **ผลการทดสอบ:** [test-results.md](test-results.md)
+
 # 🔧 LeaveEasy — จุดเริ่มต้นของใบงาน
 
 **ADT-RAISE Non-Degree Batch 2 · Module 2: MVP-Ready** (สัปดาห์ที่ 6–9)
@@ -54,6 +57,17 @@ leaveeasy-spec.md             📄 ข้อกำหนดของระบบ
 ข้อมูลที่เพิ่งกรอกจะหายหมด เพราะข้อมูลทั้งหมดยังเป็นของปลอมที่พิมพ์ค้างไว้ใน `js/data.js`
 
 **นั่นคือสิ่งที่คุณจะแก้ในสัปดาห์ที่ 6** — ต่อระบบเข้ากับคลังเก็บข้อมูลจริง
+
+---
+
+## 🔐 Firestore, ล็อกอิน และกฎเฝ้าข้อมูล (data-auth)
+
+- ข้อมูลอ่าน/เขียนจาก Firestore จริง · ล็อกอินด้วย Firebase Authentication (`login.html`, `signup.html`)
+- ใส่ข้อมูลตัวอย่าง: เปิด `seed.html` แล้วกดปุ่มหนึ่งครั้ง (ทำก่อน publish กฎรายห้อง)
+- **`firestore.rules` ไม่ได้ขึ้นออนไลน์เอง — ต้อง copy เนื้อหาไฟล์ไป publish เองที่ Firebase Console**
+  (Firestore Database → Rules → วางทับ → Publish) หรือใช้ `firebase deploy --only firestore:rules`
+- บทบาทผู้สมัครใหม่เป็น `employee` เสมอ · ถ้าจะทดสอบเป็น `manager` หรือ `hr` ให้แก้ช่อง `role` ในไฟล์ `users/<uid>` ของบัญชีนั้นใน Console
+- `firebase.json` ใส่ `js/config.local.js` (คีย์ลับ) ไว้ใน `hosting.ignore` แล้ว จะไม่ถูกอัปโหลดขึ้น hosting · ตรวจรายการไฟล์ที่ขึ้นก่อน `firebase deploy` ทุกครั้งอยู่ดี
 
 ---
 

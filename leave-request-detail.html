@@ -6,9 +6,8 @@
   <title>รายละเอียดใบลา · LeaveEasy</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/util.js" defer></script>
-  <script src="js/nav.js" defer></script>
-  <script src="js/data.js" defer></script>
-  <script src="js/leave-request-detail.js" defer></script>
+  <script type="module" src="js/nav.js"></script>
+  <script type="module" src="js/leave-request-detail.js"></script>
 </head>
 <body>
   <div id="nav"></div>
@@ -20,6 +19,19 @@
       <p>กำลังโหลดข้อมูล…</p>
     </div>
 
+    <!-- ปุ่มอนุมัติ/ไม่อนุมัติ ถูกวาดโดย leave-request-detail.js ภายใน #กล่องใบลา (เฉพาะใบที่รอพิจารณา) -->
+
+    <!-- กล่องสรุปใบลาโดย AI (ตำแหน่งว่างสำหรับ ai-feature) — เปิดให้เฉพาะผู้อนุมัติ/ฝ่ายบุคคล -->
+    <div id="กล่องสรุปAI" class="card hidden">
+      <h2>สรุปใบลาโดย AI</h2>
+      <div class="btn-row">
+        <button type="button" class="btn-ghost" id="ปุ่มสรุปAI">ให้ AI สรุปใบลานี้</button>
+      </div>
+      <div id="ป้ายสรุปAI" class="alert alert-ai hidden">ข้อเสนอจาก AI — โปรดตรวจสอบก่อนตัดสินใจ</div>
+      <div id="เตือนสรุปAI" class="alert alert-error hidden"></div>
+      <div id="ผลสรุปAI"></div>
+    </div>
+
     <div id="กล่องความเห็น" class="card hidden">
       <h2>ความเห็นการอนุมัติ</h2>
       <div id="รายการความเห็น"></div>
@@ -29,6 +41,15 @@
       <div id="เตือนความเห็น" class="alert alert-error hidden"></div>
       <div class="btn-row">
         <button type="button" id="ปุ่มส่งความเห็น">ส่งความเห็น</button>
+      </div>
+    </div>
+
+    <!-- ลบใบลา: แสดงเฉพาะเจ้าของใบ และเฉพาะใบที่ยังรอพิจารณา (กำหนดโดย data-auth) -->
+    <div id="กล่องลบใบลา" class="card hidden">
+      <h2>ลบใบลา</h2>
+      <p class="hint">ลบได้เฉพาะใบที่ยังรอพิจารณา ระบบจะถามยืนยันก่อนลบทุกครั้ง</p>
+      <div class="btn-row">
+        <button type="button" class="btn-danger" id="ปุ่มลบใบลา">ลบใบลานี้</button>
       </div>
     </div>
 

@@ -1,23 +1,42 @@
 // ─────────────────────────────────────────────────────────────
-// js/leave-requests.js — หน้าที่ 1 รายการใบลา
-// สัปดาห์ที่ 6 (ต้นสัปดาห์): อ่านจากข้อมูลปลอมใน js/data.js
+// js/leave-requests.js — หน้าที่ 1 รายการใบลา (อ่านจาก Firestore จริง)
+// ผู้ขอลาเห็นเฉพาะใบของตัวเอง · ผู้อนุมัติและฝ่ายบุคคลเห็นทุกใบ
 // ─────────────────────────────────────────────────────────────
 
-(function () {
-  var กล่อง = document.getElementById("ผลลัพธ์");
+import { db } from "./firebase-config.js";
+import { collection, getDocs, query, where, orderBy, limit }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { ผู้ใช้ปัจจุบันพร้อมบทบาท, เป็นผู้พิจารณา } from "./auth-role.js";
 
-  // ใบลาจากข้อมูลปลอม บวกกับใบที่เพิ่งยื่นในหน้าถัดไป
-  // (สัปดาห์นี้ยังไม่ต่อฐานข้อมูล ใบที่ยื่นใหม่จึงหายเมื่อปิดเบราว์เซอร์)
-  var ใบลาที่ยื่นใหม่ = JSON.parse(sessionStorage.getItem("ใบลาที่ยื่นใหม่") || "[]");
-  var ใบลาทั้งหมด = window.LEAVE_DATA.leaveRequests.concat(ใบลาที่ยื่นใหม่);
+var กล่อง = document.getElementById("ผลลัพธ์");
+var จำนวนสูงสุด = 100;   // ไม่แบ่งหน้า จึงจำกัดจำนวนที่ดึงมาแสดง
 
-  // ถ้ามีสถานะติดมาท้าย URL ให้กรองเฉพาะสถานะนั้น
-  var สถานะที่กรอง = ค่าจากURL("status");
-  if (สถานะที่กรอง) {
-    ใบลาทั้งหมด = ใบลาทั้งหมด.filter(function (ใบ) { return ใบ.status === สถานะที่กรอง; });
-    document.querySelector(".subtitle").textContent =
-      "กำลังแสดงเฉพาะใบลาที่สถานะ " + สถานะที่กรอง + " · กดเมนู รายการใบลา เพื่อดูทั้งหมด";
+(async function () {
+  var ผู้ใช้ = await ผู้ใช้ปัจจุบันพร้อมบทบาท();
+  if (!ผู้ใช้.user) return;   // nav.js พาไปหน้าล็อกอินให้แล้ว
+
+  var ใบลาทั้งหมด = [];
+  try {
+    var คำสั่ง;
+    if (เป็นผู้พิจารณา(ผู้ใช้.role)) {
+      คำสั่ง = query(collection(db, "leaveRequests"), orderBy("createdAt", "desc"), limit(จำนวนสูงสุด));
+    } else {
+      คำสั่ง = query(collection(db, "leaveRequests"), where("requesterId", "==", ผู้ใช้.user.uid), limit(จำนวนสูงสุด));
+    }
+    var ผล = await getDocs(คำสั่ง);
+    ผล.forEach(function (d) {
+      var ข้อมูล = d.data();
+      ข้อมูล.id = d.id;
+      ใบลาทั้งหมด.push(ข้อมูล);
+    });
+  } catch (e) {
+    console.error(e);
+    กล่อง.innerHTML = "<p>โหลดรายการใบลาไม่สำเร็จ — ตรวจการเชื่อมต่อหรือสิทธิ์การเข้าถึง</p>";
+    return;
   }
+
+  // ใหม่ไปเก่า
+  ใบลาทั้งหมด.sort(function (a, b) { return a.createdAt < b.createdAt ? 1 : -1; });
 
   แสดงตาราง(ใบลาทั้งหมด);
 
@@ -53,7 +72,7 @@
     // กดที่แถวไหน ไปหน้ารายละเอียดของใบนั้น
     กล่อง.querySelectorAll("tr.clickable").forEach(function (แถว) {
       แถว.addEventListener("click", function () {
-        location.href = "leave-request-detail.html?id=" + แถว.dataset.id;
+        location.href = "leave-request-detail.html?id=" + encodeURIComponent(แถว.dataset.id);
       });
     });
   }
